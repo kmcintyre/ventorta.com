@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="35pt" height="25pt" viewBox="0 0 35 25" version="1.1">
+<defs>
+<g>
+<symbol overflow="visible" id="glyph0-0">
+<path style="stroke:none;" d="M 1.0625 3.71875 L 1.0625 -14.8125 L 11.5625 -14.8125 L 11.5625 3.71875 Z M 2.25 2.546875 L 10.390625 2.546875 L 10.390625 -13.625 L 2.25 -13.625 Z M 2.25 2.546875 "/>
+</symbol>
+<symbol overflow="visible" id="glyph0-1">
+<path style="stroke:none;" d="M 0.375 -15.3125 L 2.578125 -15.3125 L 6.3125 -8.546875 L 10.03125 -15.3125 L 12.265625 -15.3125 L 7.359375 -6.875 L 7.359375 0 L 5.265625 0 L 5.265625 -6.875 Z M 0.375 -15.3125 "/>
+</symbol>
+</g>
+<linearGradient id="linear0" gradientUnits="userSpaceOnUse" x1="-344.15295" y1="274.711" x2="-395.84943" y2="425.39993" gradientTransform="matrix(-0.0629239,0,0,0.0629239,-13.273848,-19.853736)">
+<stop offset="0" style="stop-color:rgb(100%,100%,100%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,100%,100%);stop-opacity:0;"/>
+</linearGradient>
+</defs>
+<g id="surface1">
+<path style=" stroke:none;fill-rule:evenodd;fill:rgb(96.078431%,49.019608%,0%);fill-opacity:1;" d="M 26.476562 0 L 9.027344 0 C 6.941406 0 5.25 1.691406 5.25 3.777344 L 5.25 21.222656 C 5.25 23.308594 6.941406 25 9.027344 25 L 26.476562 25 C 28.5625 25 30.25 23.308594 30.25 21.222656 L 30.25 3.777344 C 30.25 1.691406 28.5625 0 26.476562 0 Z M 26.476562 0 "/>
+<path style=" stroke:none;fill-rule:evenodd;fill:url(#linear0);" d="M 23.644531 1.070312 L 11.855469 1.070312 C 8.734375 1.070312 6.222656 3.601562 6.222656 6.75 L 6.222656 18.25 C 6.324219 20.707031 6.710938 19.15625 7.449219 16.433594 C 8.3125 13.273438 11.109375 10.511719 14.519531 8.441406 C 17.121094 6.859375 20.035156 5.851562 25.335938 5.753906 C 28.34375 5.699219 28.078125 1.851562 23.644531 1.070312 Z M 23.644531 1.070312 "/>
+<g style="fill:rgb(100%,100%,100%);fill-opacity:1;">
+  <use xlink:href="#glyph0-1" x="11.332031" y="20.341187"/>
+</g>
+</g>
+</svg>
