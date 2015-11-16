@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.0"
+   width="280"
+   height="200"
+   id="svg2">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient2555">
+      <stop
+         id="stop2557"
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop2559"
+         style="stop-color:#ffffff;stop-opacity:0"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="-344.15295"
+       y1="274.711"
+       x2="-395.84943"
+       y2="425.39993"
+       id="linearGradient2449"
+       xlink:href="#linearGradient2555"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.50339116,0,0,0.50339124,295.44338,187.5141)" />
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title />
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag />
+        </dc:subject>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:description />
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title />
+          </cc:Agent>
+        </dc:contributor>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-401.63416,-346.34399)"
+     id="layer1">
+    <rect
+       width="200.01556"
+       height="200"
+       rx="30.203474"
+       ry="30.203474"
+       x="-643.64972"
+       y="346.34399"
+       transform="scale(-1,1)"
+       id="rect1942"
+       style="fill:#f57d00;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+    <path
+       d="m 590.80549,354.89413 -94.32712,0 c -24.96867,0 -45.06979,20.26451 -45.06979,45.43612 l 0,92.02738 c 0.80821,19.64857 3.91702,7.22716 9.8345,-14.53232 6.87738,-25.28891 29.2749,-47.39178 56.55112,-63.95663 20.81908,-12.64333 44.12204,-20.71688 86.53963,-21.48493 24.05624,-0.43556 21.93247,-31.22089 -13.52834,-37.48962 z"
+       id="path1950"
+       style="fill:url(#linearGradient2449);fill-opacity:1;fill-rule:evenodd;stroke:none" />
+    <text
+       x="492.28516"
+       y="508.18985"
+       id="text2845"
+       xml:space="preserve"
+       style="font-size:171.17303467px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Comic Sans MS;-inkscape-font-specification:Comic Sans MS"><tspan
+         x="492.28516"
+         y="508.18985"
+         id="tspan2847"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Mono">Y</tspan></text>
+  </g>
+</svg>
