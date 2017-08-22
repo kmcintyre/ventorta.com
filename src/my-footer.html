@@ -61,17 +61,22 @@
    <script>
       Polymer({
         is: 'my-footer', 
-        next: function () {        	
-        	document.querySelector('my-app').selected = Math.min(document.querySelector('my-app').items.length -1, this.selected) + 1;        	        	
+        updateSelected: function (ns) {
+        	document.querySelector('my-app').shadowRoot.querySelector('#mylistbox').selected = ns;
+        },
+        next: function () {
+        	var ns = Math.min(document.querySelector('my-app').shadowRoot.querySelector('#mylistbox').items.length -1, document.querySelector('my-app').selected) + 1
+        	this.updateSelected(ns);
         },
         prev: function () {
-        	document.querySelector('my-app').selected =  Math.max(1, this.selected) - 1;        	
+        	var ns = Math.max(1, document.querySelector('my-app').selected) - 1;
+        	this.updateSelected(ns);
         },        
         checkflush: function(ign) {
         	//console.log('selected to:', ign)
         	if (this.selected == 0 ) { 
         		return "flushleft" 
-        	} else if (this.selected == document.querySelector('my-app').items.length - 1 ) { 
+        	} else if (document.querySelector('my-app').selected == document.querySelector('my-app').shadowRoot.querySelector('#mylistbox').items.length - 1 ) { 
         		return "flushright" 
         	}
         	return "";
