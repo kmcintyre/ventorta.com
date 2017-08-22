@@ -1,0 +1,151 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
+<link rel="import" href="../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+
+<dom-module id="chart-social">
+   <template>
+      <style>
+         :host {
+         	height: 200px
+      	 } 
+         google-chart {
+         	width: 100%;
+         }   
+    	.hidden {
+     		display:none;
+    	 }             
+    	 paper-progress {
+    	 	--paper-progress-active-color: #2196f3;
+    	 	width:100%
+    	 }        
+      </style>
+		<iron-ajax
+		   auto
+		   url="{{domain('/chart/social.json')}}"
+		   handle-as="json"
+		   on-response="chartSocial"
+		   debounce-duration="300">
+		</iron-ajax>		     
+		<google-chart 			
+			id="googlechart"
+			class="hidden"
+			type="column"
+			min="{{min}}"
+			max="{{max}}"
+			begin="{{begin}}"
+			end="{{end}}"
+		></google-chart>
+		<paper-progress id="progress" value="10" indeterminate bottom-item></paper-progress>                     
+   </template>
+   <script>
+      var chartdata;
+      
+      function nativeChartData() {
+       	var data = new google.visualization.DataTable();
+      	data.addColumn('date', 'date');
+      	data.addColumn('number', 'sum');
+      	data.addColumn({type: 'string', role: 'tooltip'});
+      	cols='[ {"label":"Date", "type":"date"}, {"label":"Sum", "type":"number"}]'
+      	var rows = chartdata.map(function (obj) {
+      		var d = new Date(obj.timestamp * 1000)
+      		var ds = obj.sum + String.fromCharCode(13) + String.fromCharCode(10) + String.fromCharCode(10) + d.toLocaleDateString().split('/')[0] + '/' + d.toLocaleDateString().split('/')[1] + ' ' + d.toLocaleTimeString().split(':00 ')[0] + ' ' + d.toLocaleTimeString().split(':00')[1];
+      		return [ d, obj.sum, ds]
+      	})
+      	data.addRows(rows)
+      	return data;   		  
+      }
+      
+      Polymer({
+        is: 'chart-social',
+        properties: {
+            min: {
+              	type: Number,
+              	reflectToAttribute: true
+            },
+            max: {
+                type: Number,
+                reflectToAttribute: true
+            },
+            begin: {
+                type: Number,
+                reflectToAttribute: true
+            },
+            end: {
+                type: Number,
+                reflectToAttribute: true
+            }
+          },        
+        behaviors: [
+      		Polymer.IronResizableBehavior
+        ],           
+        chartOptions: function() {
+        	var min, max, begin, end;
+          	chartdata.forEach(function (obj) {          		
+          		try {
+	          		if ( obj.sum < min || !min ) { min = obj.sum }
+	          		if ( obj.sum > max || !max ) { max = obj.sum }
+	          		if ( obj.timestamp < begin || !begin ) { begin = obj.timestamp }
+	          		if ( obj.timestamp > end || !end ) { end = obj.timestamp }
+          		} catch (err) {
+          			console.log(err)
+          		}
+          	});
+          	
+           	var f = new Date( begin * 1000 ).toLocaleDateString()
+           	var t = new Date( end * 1000 ).toLocaleDateString()
+           	var sub = 'between:' + f + '-' + t;
+           	return {
+           		title: 'Throughput',
+           		subtitle: sub,
+           		vAxis: { minValue: min, maxValue: max + ((max - min) * .2), gridlines: {color: 'none'}, textPosition: 'none' },
+           		hAxis: { gridlines: {color: 'none'}, format: 'd MMM'},
+           		width: '100%',
+           		height: '200',
+           		legend: 'none',
+           		chartArea: {width: '100%', height: '100%'},
+           		begin: begin,
+           		end: end,
+           		min: min,
+           		max: max,
+           	}        	
+        },
+        domain: function (url) {
+        	return '//' + nativeDomain() + url        	
+        },        
+        ready: function() {
+        	console.log('ready')
+        },
+        listeners: {
+        	'iron-resize': '_onIronResize'
+        },       
+        updateChartProperies: function() {
+        	this.set('min', this.$.googlechart.options.min)
+        	this.set('max', this.$.googlechart.options.max)
+        	this.set('begin', this.$.googlechart.options.begin)
+        	this.set('end', this.$.googlechart.options.end)
+        },
+        chartSocial: function(irondata) {        	
+          	//console.log('set data', irondata.detail.response)
+          	chartdata = irondata.detail.response
+          	this.$.googlechart.options = this.chartOptions()          	
+          	this.$.googlechart.data = nativeChartData()
+          	this.updateChartProperies();
+          	this.$.googlechart.classList.remove('hidden')
+          	this.$.progress.classList.add('hidden')
+        },        
+        _onIronResize: function() {
+        	if ( chartdata ) {
+              	this.$.googlechart.options = this.chartOptions()
+              	this.$.googlechart.data = nativeChartData()
+              	this.updateChartProperies();
+        	}
+        }
+      });
+   </script>
+</dom-module>

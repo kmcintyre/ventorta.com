@@ -1,0 +1,183 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html" />
+<dom-module id="twitter-since">
+   <template>
+      <style>
+         :host {
+         display: flex;
+         flex-direction: column;         	
+         }        
+         app-box {
+         direction: rtl;
+         white-space:nowrap;   
+         padding: 0 8px 0 8px;
+         }
+         app-box > * {
+         vertical-align:top;
+         }
+         paper-card {
+         width: 175px;         
+         }
+         .card-content {
+         padding: 4px;
+         }
+         .card-content paper-item {
+         display: flex;
+         flex: row;
+         direction: ltr;  	        	        
+         }
+         .card-content paper-item span:nth-child(1) {
+         font-size: 1.16em;
+         flex: 0   	                  
+         }
+         .card-content paper-item span:nth-child(1)::before {
+         font-size: .66em;
+         content: attr(title);
+         position: absolute;
+         transform: translate(-5px, -20px);         	           
+         }         
+         .card-content paper-item span:nth-child(2) {
+         flex-grow: 1;
+         text-align:right;
+         font-weight: bold;         	         	         
+         font-size: 1.33em;         
+         }
+         .card-content paper-item span:nth-child(2)::before {
+         content: attr(prefix);
+         font-size: .66em;         	
+         }         
+         .card-content paper-item span:nth-child(2)::after {
+         content: attr(suffix);
+         font-size: 1em;         	
+         }         
+      </style>
+      <div>{{tweets.length}}</div>
+      <app-box>
+         <template is="dom-repeat" items="[[tweets]]">
+            <paper-card image="{{domain(item)}}">
+               <div class="card-content">
+                  <div>
+                     {{item.twitter}}
+                  </div>
+                  <template is="dom-if" if="[[isLeague(item, 'market')]]">
+                     <paper-item>
+                        <span title="{{item.index}}">{{item.symbol}}</span>	               			
+                        <span prefix="$">{{item.price}}</span>
+                     </paper-item>
+                  </template>
+                  <template is="dom-if" if="[[isLeague(item, 'startup')]]">
+                     <paper-item>
+                        <span title="incubator">{{item.incubator}}</span>
+                       	<span></span>
+                     </paper-item>
+                  </template>
+                  <template is="dom-if" if="[[isLeague(item, 'venture')]]">
+                     <template is="dom-if" if="[[item.rank]]">
+                        <paper-item>
+                           <span title="rank">[[item.rank]]</span>
+                           <template is="dom-if" if="[[item.valuation]]">
+                              <span prefix="$" suffix="B">[[_toValuation(item)]]</span>
+                           </template>
+                        </paper-item>
+                     </template>
+                  </template>
+               </div>
+            </paper-card>
+         </template>
+      </app-box>
+   </template>
+   <script>   
+      Polymer({
+        is: 'twitter-since',
+        properties: {
+            tweets: {
+              type: Array,
+              value: [],
+              notify: true
+            }
+        },
+        _toValuation: function(v) {
+        	return v.valuation.substring(1, v.valuation.indexOf(' '))
+        },
+        _toKeys: function(obj) {
+            return Object.keys(obj);
+        },        
+        isLeague: function(tweet, league_name) {
+        	return tweet.league === league_name;
+        },
+        domain: function (item) {
+        	return 'http://' + nativeDomain() + '/' + item.league + '/large/' + item.twitter + '.png'        	
+        }, 
+        addtweet: function(tweet, end) {
+        	this.notifyPath('tweets', end ? this.tweets.concat(tweet) : [tweet].concat(this.tweets))
+        },
+        attached: function () {
+        	console.log('attached:', document.querySelector('ws-element'))
+        },
+        ready: function() {
+     	    var cs = document.querySelector('my-app').shadowRoot.querySelector('#chartsocial');
+    	    var ws = document.querySelector('my-app').shadowRoot.querySelector('#websocket');        	
+        	
+    	    Promise.all([
+         	new Promise((resolve, reject) => {
+         		new MutationObserver(function(mutations) {        		
+             		mutations.forEach(function(mutation) {
+             			if (ws.state == "1" ) {
+             				console.log('websocket up')
+             				resolve(true)	
+             			}
+             		});    
+             	}).observe(ws, {
+                		attributes: true, 
+                		childList: false, 
+                		characterData: false 
+                	});	        		
+         	}), 
+         	new Promise((resolve, reject) => {	        		
+             	new MutationObserver(function(mutations) {        		
+             		mutations.forEach(function(mutation) {
+             			if (mutation.attributeName == 'end') {
+             				console.log('chart rendered')
+             				resolve(true)
+             			}
+             		});    
+             	}).observe(cs, {
+                		attributes: true, 
+                		childList: false, 
+                		characterData: false 
+                	});	        		
+        		})
+        	]).then(values => {      		
+       		   document.querySelector('my-app').addEventListener('onmessage', function (j) {
+       			   var ts = document.querySelector('my-app').shadowRoot.querySelector('#twittersince');
+       			   if ( j.detail.limit ) {
+       				   if ( j.detail.social_ts_received > cs.end ) {           				  
+       					   ts.addtweet(j.detail, true);
+           				   ws.send( JSON.stringify({
+           					   website: nativeDomain(),
+           				       backfill: {
+           				    	   platform: 'twitter',
+           				    	   limit: 'unknown',
+           				    	   tweet_id: j.detail.tweet_id
+           				       }
+           		    	   }));     		           			          					   
+       				   }
+       			   } else if (j.detail.tweet_id) {
+       					ts.addtweet(j.detail, false);
+       			   }
+       		  });           		
+        		ws.send( JSON.stringify({
+            	   website: nativeDomain(),
+            	   backfill: {
+            		   platform: 'twitter',
+            		   limit: 'unknown'
+            	   }
+               }));
+        	});
+        }
+      });
+   </script>
+</dom-module>

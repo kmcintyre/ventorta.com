@@ -1,0 +1,125 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/demo/sample-content.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="ws-element.html">
+<link rel="import" href="my-listbox.html">
+<link rel="import" href="my-footer.html">
+<link rel="import" href="chart-social.html">
+<link rel="import" href="twitter-since.html">
+<dom-module id="my-app">
+   <template>
+      <style>
+         :host {
+    	     --app-drawer-width: 200px;
+         }      
+         app-drawer-layout:not([narrow]) [drawer-toggle] {
+	         display: none;
+         }
+         paper-listbox paper-item {
+	         cursor: pointer;
+         }
+         paper-item div {
+	         display:none;
+         }
+         div.iron-selected {
+	         width: 100%;
+	         height: 100%;
+         }
+         app-header {            
+	         background-image: url(/curator_background.png);
+	         background-position: -20px 105px;      	
+         }
+         google-chart {
+         	width: 100%;		 	
+         }              
+         #controls {
+	         position:fixed;
+	         padding: 0 32px;
+	         bottom: 16px;
+	         right: 0;
+	         bottom: 8px;
+	         padding: 0 8px;
+	         width: calc(100% - 150px);		    
+	         box-sizing: border-box;
+	         pointer-events: none;
+	         display: flex;
+	         flex-direction: row;
+	         z-index:1;
+         }
+         app-drawer-layout[narrow] app-header-layout #controls {
+         	width:100%
+         }
+         .title {
+	         background-color: white;
+	         border: 2px solid black;
+	         border-radius: 12px;
+	         padding: 4px;
+	         display:inline-block;
+	         box-shadow: 1px 1px 1px #2196f3;
+         }
+      </style>
+      <ws-element id="websocket" state="{{ state }}" url="ws://service.ventorta.com:8080"></ws-element>
+      <app-drawer-layout>
+         <app-drawer slot="drawer">
+         	<my-listbox id="mylistbox"></my-listbox>
+         </app-drawer>
+         <app-header-layout>
+            <app-header slot="header" condenses fixed shadow effects="resize-title">
+               <app-toolbar>
+                  <paper-icon-button icon="app:menu" drawer-toggle></paper-icon-button>
+                  <div condensed-title>
+                     <h1 class="title">{{site}}</h1>
+                  </div>
+               </app-toolbar>
+               <app-toolbar>
+                  <div main-title spacer>
+                     <h1 class="title">{{site}}</h1>
+                  </div>
+               </app-toolbar>
+            </app-header>
+            <iron-pages selected="{{selected}}">
+               <div>
+                  <chart-social id="chartsocial"></chart-social>
+                  <twitter-since id="twittersince"></twitter-since>
+               </div>
+               <div>
+                  <sample-content size="2"></sample-content>
+               </div>
+               <div>
+                  <sample-content size="3"></sample-content>
+               </div>
+               <div>
+                  <sample-content size="4"></sample-content>
+               </div>
+            </iron-pages>
+            <my-footer selected="{{selected}}"></my-footer>
+         </app-header-layout>
+      </app-drawer-layout>
+   </template>
+   <script>
+      var lingo = JSON.parse(document.querySelector('meta[name="lingo"]').getAttribute('content'))
+      Polymer({
+        is: 'my-app',
+        ready: function() {        	
+        	this.set('site', nativeDomain()),
+        	this.$.mylistbox.addEventListener('selected-changed', e => {
+        		this.set('selected', this.$.mylistbox.selected)
+        	})
+        },
+        attached: function() {
+        	this.set('selected', this.$.mylistbox.selected)
+        }, 
+      });
+   </script>
+</dom-module>

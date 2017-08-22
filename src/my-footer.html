@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/demo/sample-content.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="ws-element.html">
+<link rel="import" href="chart-social.html">
+<link rel="import" href="twitter-since.html">
+
+<dom-module id="my-footer">
+   <template>
+      <style>
+         #controls {
+	         position:fixed;
+	         padding: 0 32px;
+	         bottom: 16px;
+	         right: 0;
+	         bottom: 8px;
+	         padding: 0 8px;
+	         width: calc(100% - 200px);		    
+	         box-sizing: border-box;
+	         pointer-events: none;
+	         display: flex;
+	         flex-direction: row;
+	         z-index:20;
+         }
+         app-drawer-layout[narrow] app-header-layout #controls {
+         	width:100%
+         }
+         #controls.flushleft paper-fab:first-child {
+         	display:none
+         }
+         #controls.flushright paper-fab:last-child {
+         	display:none
+         }		
+         .navbutton {
+         	pointer-events: initial;
+         }	
+      </style>        
+      <footer id="controls"
+         class$="{{checkflush(selected)}}"
+         >
+         <paper-fab icon="chevron-left" 
+            class="navbutton" 
+            on-click="prev"				
+            ></paper-fab>
+         <div style="flex-grow: 1"></div>
+         <paper-fab  
+            icon="chevron-right" 
+            class="navbutton" 
+            on-click="next"></paper-fab>
+      </footer>
+   </template>
+   <script>
+      Polymer({
+        is: 'my-footer', 
+        next: function () {        	
+        	document.querySelector('my-app').selected = Math.min(document.querySelector('my-app').items.length -1, this.selected) + 1;        	        	
+        },
+        prev: function () {
+        	document.querySelector('my-app').selected =  Math.max(1, this.selected) - 1;        	
+        },        
+        checkflush: function(ign) {
+        	//console.log('selected to:', ign)
+        	if (this.selected == 0 ) { 
+        		return "flushleft" 
+        	} else if (this.selected == document.querySelector('my-app').items.length - 1 ) { 
+        		return "flushright" 
+        	}
+        	return "";
+        }
+      });
+   </script>
+</dom-module>
