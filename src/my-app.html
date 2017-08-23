@@ -46,23 +46,6 @@
          google-chart {
          width: 100%;		 	
          }              
-         #controls {
-         position:fixed;
-         padding: 0 32px;
-         bottom: 16px;
-         right: 0;
-         bottom: 8px;
-         padding: 0 8px;
-         width: calc(100% - 250px);		    
-         box-sizing: border-box;
-         pointer-events: none;
-         display: flex;
-         flex-direction: row;
-         z-index:1;
-         }
-         app-drawer-layout[narrow] app-header-layout #controls {
-         width:100%
-         }
          app-toolbar .title {
          display: inline;
          font-family: 'Permanent Marker', cursive;
@@ -103,7 +86,7 @@
          .sideways ul li span:nth-child(1) {
          padding-right: 2px;
          }
-         app-drawer-layout[narrow] app-header-layout #stats.sideways {
+         app-drawer-layout[narrow] #stats.sideways {
          display:none
          }
          .instances {
@@ -130,7 +113,21 @@
 		  text-align: center;
 		  line-height: 50px;
 		  color: black;
-		}	     
+		 }	 
+         app-drawer-layout app-header-layout #myfooter {
+	         position:fixed;
+	         padding: 0 32px;
+	         bottom: 16px;
+	         right: 0;
+	         bottom: 8px;
+	         padding: 0 8px;
+	         width: calc(100% - 250px);		    
+	         box-sizing: border-box;
+	         z-index:2;
+         }
+		 app-drawer-layout[narrow] app-header-layout #myfooter {
+         	width:100%
+         }         
       </style>
       <iron-ajax
          auto
