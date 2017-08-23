@@ -25,7 +25,8 @@
     "paper-progress": "PolymerElements/paper-progress#^2.0.1",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "iron-list": "PolymerElements/iron-list#^2.0.8",
-    "paper-input": "PolymerElements/paper-input#^2.0.1"
+    "paper-input": "PolymerElements/paper-input#^2.0.1",
+    "iron-scroll-threshold": "PolymerElements/iron-scroll-threshold#^2.0.0"
   },
   "resolutions": {
     "polymer": "^2.0.0-rc.3",

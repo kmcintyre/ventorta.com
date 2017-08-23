@@ -2,7 +2,8 @@
 <link rel="import" href="../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html" />
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
 <dom-module id="twitter-since">
    <template>
       <style>
@@ -52,7 +53,10 @@
          .card-content paper-item span:nth-child(2)::after {
          content: attr(suffix);
          font-size: 1em;         	
-         }         
+         }    
+         .hidden {
+         display:none
+         }     
       </style>
       <div>{{tweets.length}}</div>
       <app-box>
@@ -60,6 +64,9 @@
             <paper-card image="{{domain(item)}}">
                <div class="card-content">
                   <div>
+	                  <span class="hidden">
+	                  		{{_toString(item)}}
+	                  </span>                  
                      {{item.twitter}}
                   </div>
                   <template is="dom-if" if="[[isLeague(item, 'market')]]">
@@ -99,6 +106,9 @@
               notify: true
             }
         },
+        _toString: function (item) {
+        	return JSON.stringify(item)
+        },
         _toValuation: function(v) {
         	return v.valuation.substring(1, v.valuation.indexOf(' '))
         },
@@ -113,9 +123,6 @@
         }, 
         addtweet: function(tweet, end) {
         	this.notifyPath('tweets', end ? this.tweets.concat(tweet) : [tweet].concat(this.tweets))
-        },
-        attached: function () {
-        	console.log('attached:', document.querySelector('ws-element'))
         },
         ready: function() {
      	    var cs = document.querySelector('my-app').shadowRoot.querySelector('#chartsocial');

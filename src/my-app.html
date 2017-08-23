@@ -8,85 +8,185 @@
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
-
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
-
 <link rel="import" href="ws-element.html">
 <link rel="import" href="my-listbox.html">
 <link rel="import" href="my-footer.html">
 <link rel="import" href="chart-social.html">
 <link rel="import" href="twitter-since.html">
+<link rel="import" href="shared-styles.html">
 <dom-module id="my-app">
    <template>
-      <style>
+      <style include="shared-styles">
          :host {
-    	     --app-drawer-width: 200px;
-         }      
+         --app-drawer-width: 250px;
+         }   
          app-drawer-layout:not([narrow]) [drawer-toggle] {
-	         display: none;
+         display: none;          	
          }
          paper-listbox paper-item {
-	         cursor: pointer;
-         }
+         cursor: pointer;
+         }         
          paper-item div {
-	         display:none;
+         display:none;
+         }
+         .menu {
+         width: 48px;
+         height: 48px;
          }
          div.iron-selected {
-	         width: 100%;
-	         height: 100%;
+         width: 100%;
+         height: 100%;
          }
-         app-header {            
-	         background-image: url(/curator_background.png);
-	         background-position: -20px 105px;      	
+         app-header {
+         background-image: url(/curator_background.png);
+         height: 200px;            	         	        	
          }
          google-chart {
-         	width: 100%;		 	
+         width: 100%;		 	
          }              
          #controls {
-	         position:fixed;
-	         padding: 0 32px;
-	         bottom: 16px;
-	         right: 0;
-	         bottom: 8px;
-	         padding: 0 8px;
-	         width: calc(100% - 150px);		    
-	         box-sizing: border-box;
-	         pointer-events: none;
-	         display: flex;
-	         flex-direction: row;
-	         z-index:1;
+         position:fixed;
+         padding: 0 32px;
+         bottom: 16px;
+         right: 0;
+         bottom: 8px;
+         padding: 0 8px;
+         width: calc(100% - 250px);		    
+         box-sizing: border-box;
+         pointer-events: none;
+         display: flex;
+         flex-direction: row;
+         z-index:1;
          }
          app-drawer-layout[narrow] app-header-layout #controls {
-         	width:100%
+         width:100%
          }
-         .title {
-	         background-color: white;
-	         border: 2px solid black;
-	         border-radius: 12px;
-	         padding: 4px;
-	         display:inline-block;
-	         box-shadow: 1px 1px 1px #2196f3;
+         app-toolbar .title {
+         display: inline;
+         font-family: 'Permanent Marker', cursive;
+         font-size: 48px;
          }
+         [condensed-title] .title {
+         font-size: 36px;
+         }
+         .trans {
+         background-color: rgba(255, 255, 255, 0.75);
+         border-radius: 12px;
+         padding: 0 6px 0 6px;         	          
+         }			
+         ul {
+         list-style: none;
+         }
+         li {
+         font-size: 2em;
+         width: 150px;
+         transition: width 2s;        	
+         }
+         li span:nth-child(2) {
+         float: right;
+         }
+         #stats {
+         position:absolute; 
+         right: 8px; 
+         top: 8px;
+         }
+         #stats.sideways {
+         top: 140px;
+         }
+         .sideways ul li {
+         width: auto;
+         display: inline-block;
+         padding-left: 8px;		
+         } 
+         .sideways ul li span:nth-child(1) {
+         padding-right: 2px;
+         }
+         app-drawer-layout[narrow] app-header-layout #stats.sideways {
+         display:none
+         }
+         .instances {
+         text-align: center;
+         }
+	    .instances {
+	      --paper-card: {
+	        margin: 20px;
+	        width: 300px;
+	        text-align:left;
+	      }	    
+	     } 
+	     .space {
+	     margin-right: 5px;
+	     }
+		.circle {
+		  float:right;
+		  width: 50px;
+		  height: 50px;
+		  background: rgba(0, 0, 0, 0.3);
+		  margin: 30px 5px 5px 5px;
+		  border-radius: 50%;
+		  position: relative;
+		  text-align: center;
+		  line-height: 50px;
+		  color: black;
+		}	     
       </style>
+      <iron-ajax
+         auto
+         url="{{domain('/site/leagues')}}"
+         handle-as="json"
+         last-response="{{leaguesData}}"
+         debounce-duration="300"></iron-ajax>
+      <iron-ajax
+         auto
+         url="{{domain('/site/curator')}}"
+         handle-as="json"
+         last-response="{{curatorData}}"
+         debounce-duration="300"></iron-ajax>
       <ws-element id="websocket" state="{{ state }}" url="ws://service.ventorta.com:8080"></ws-element>
       <app-drawer-layout>
          <app-drawer slot="drawer">
-         	<my-listbox id="mylistbox"></my-listbox>
+            <my-listbox id="mylistbox"></my-listbox>
          </app-drawer>
          <app-header-layout>
-            <app-header slot="header" condenses fixed shadow effects="resize-title">
+            <app-header id="appheader" slot="header" condenses fixed shadow  effects="resize-title">
                <app-toolbar>
-                  <paper-icon-button icon="app:menu" drawer-toggle></paper-icon-button>
+                  <paper-icon-button icon="menu" drawer-toggle class="menu"></paper-icon-button>
                   <div condensed-title>
-                     <h1 class="title">{{site}}</h1>
+                     <h1 class="trans title">{{site}}</h1>
                   </div>
                </app-toolbar>
                <app-toolbar>
                   <div main-title spacer>
-                     <h1 class="title">{{site}}</h1>
+                     <h1 class="trans title">{{site}}</h1>
                   </div>
                </app-toolbar>
+               <div id="stats">
+                  <ul>
+                     <li class="trans">
+                        <span class="entities"></span>
+                        <span>
+                        {{curation(curatorData, 0, 'entity_count')}}
+                        </span>
+                     <li class="trans">
+                        <span class="twitter"></span>
+                        <span>
+                        {{curation(curatorData, 0, 'twitter_count')}}
+                        </span>
+                     <li class="trans">
+                        <span class="facebook"></span>
+                        <span>
+                        {{curation(curatorData, 0, 'facebook_count')}}
+                        </span>
+                     <li class="trans">
+                        <span class="instagram"></span>
+                        <span>
+                        {{curation(curatorData, 0, 'instagram_count')}}
+                        </span>
+                     <li>
+                  </ul>
+               </div>
             </app-header>
             <iron-pages selected="{{selected}}">
                <div>
@@ -99,8 +199,20 @@
                <div>
                   <sample-content size="3"></sample-content>
                </div>
-               <div>
-                  <sample-content size="4"></sample-content>
+               <div class="instances">
+                  <iron-ajax
+                     auto
+                     url="{{domain('/site/instances')}}"
+                     handle-as="json"
+                     last-response="{{instancesData}}"
+                     debounce-duration="300"></iron-ajax>
+                  <template is="dom-repeat" items="{{instancesData}}">
+                     <paper-card>
+                     	<div class="circle">{{balance(item)}}</div>
+                        <paper-item><span class="instance space"></span>{{item.tag}}</paper-item>
+                        <paper-item><span class="calendar space"></span>{{date(item.launch_time)}}</paper-item>                        
+                     </paper-card>
+                  </template>
                </div>
             </iron-pages>
             <my-footer id="myfooter" selected="{{selected}}"></my-footer>
@@ -111,15 +223,50 @@
       var lingo = JSON.parse(document.querySelector('meta[name="lingo"]').getAttribute('content'))
       Polymer({
         is: 'my-app',
+        isSelected: function (selected, value) {
+        	console.log('selected', selected, value)
+        	return selected == value;        	
+        },        
+        date: function (t) {
+        	var d = new Date(t*1000)
+        	if ( d.toLocaleDateString() === new Date().toLocaleDateString() ) {
+        		return d.toLocaleTimeString()	
+        	} else {
+        		return d.toLocaleDateString().split('/')[0] + '/' + d.toLocaleDateString().split('/')[1];
+        	}
+        },
+        balance: function (instance) {
+        	if (instance.balance) {
+        		return parseInt(instance.balance)
+        	} else {
+        		return 0
+        	}
+        },
+        curation: function (data, index, name) {
+        	return data[index][name];
+        },
+        domain: function (url) {
+        	return '//' + nativeDomain() + url        	
+        },
+        stringify: function (item) {
+        	return JSON.stringify(item);
+        },
         ready: function() {        	
         	this.set('site', nativeDomain()),
         	this.$.mylistbox.addEventListener('selected-changed', e => {
         		this.set('selected', this.$.mylistbox.selected)
         	})
-        },
-        attached: function() {
         	this.set('selected', this.$.mylistbox.selected)
-        }, 
+        	var appheader = this.$.appheader;
+        	var stats = this.$.stats;
+        	document.addEventListener('scroll', function(e) {
+        		if ( appheader.getBoundingClientRect().bottom < 150 && !stats.classList.contains('sideways') ) {
+        			stats.classList.add('sideways')
+        		} else if ( appheader.getBoundingClientRect().bottom > 150 && stats.classList.contains('sideways') ) {
+        			stats.classList.remove('sideways')
+        		}
+        	}, true);
+        } 
       });
    </script>
 </dom-module>
