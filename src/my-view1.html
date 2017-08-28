@@ -1,0 +1,29 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="chart-social.html">
+<link rel="import" href="twitter-since.html">
+
+<link rel="import" href="shared-styles.html">
+
+
+<dom-module id="my-view1">
+   <template>
+      <style include="shared-styles">
+         :host {         	
+         }   
+      </style>
+      <div>
+	      <chart-social id="chartsocial"></chart-social>
+		  <twitter-since id="twittersince"></twitter-since>
+	  </div>
+   </template>
+   <script>
+		class MyView1 extends Polymer.Element {
+		  static get is() { return 'my-view1'; }
+		  constructor() {
+		    super();
+		  }
+		}            
+      	customElements.define(MyView1.is, MyView1);      
+   </script>
+</dom-module>

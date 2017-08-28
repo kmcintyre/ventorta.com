@@ -1,6 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="redux-mixin.html">
+
 <dom-module id="my-listbox">
    <template>
       <style>
@@ -59,10 +62,10 @@
          }           
       </style>
       <paper-listbox selected="{{selected}}">
-         <template is="dom-repeat" items="{{items}}">
+         <template is="dom-repeat" items="[[menu]]">
             <paper-item name$="[[item]]" class="toc-item">
                <i>{{displayIndex(index)}}</i><span>{{item.name}}</span>
-               <template is="dom-if" if="{{showsub(index, selected)}}">
+               <template is="dom-if" if="[[showsub(index, selected)]]">
                   <div>subview</div>
                </template>
             </paper-item>
@@ -70,28 +73,30 @@
       </paper-listbox>
    </template>
    <script>
-      Polymer({
-        is: 'my-listbox',
-        ready: function () {
-        	this.set('selected', 3);
-        },
-        displayIndex: function(index) {
-            return index + 1;
-        },
-        properties: {
-    	  selected: {
-            notify: true
-          },
-          items: {
-            type: Array,
-            value: function() {
-              return [{name: 'Throughput'}, {name: lingo.leagues}, {name: 'Stream'}, {name: 'Systems'}];
-            }
+   class MyListbox extends SelectedMixin(Polymer.Element) {
+       
+	   static get is() {
+           return 'my-listbox';
+       }	   
+	   
+       static get properties() {
+           return {
+              menu: {
+                type: Array,
+                statePath: 'menu'
+              }
           }
-        },
-        showsub: function(ind, selected) {
-        	return ind == selected
-        },
-      });
-   </script>
+       }
+       static get observers() {
+    	   return ['updateSelected(selected)']
+       }
+       displayIndex(index) {
+           	return index + 1
+       }
+       showsub(ind, selected) {
+       		return ind == selected
+       }       
+   }
+   customElements.define(MyListbox.is, MyListbox);
+   </script>   
 </dom-module>

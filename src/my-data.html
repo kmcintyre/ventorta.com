@@ -1,0 +1,82 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="redux-mixin.html">
+
+<dom-module id="my-data">
+   <template>
+      <style>
+         :host {
+            
+         }
+      </style>
+      <iron-ajax
+         auto
+         url="{{domain('/site/leagues')}}"
+         handle-as="json"
+         last-response="{{leagues}}"
+         debounce-duration="300"></iron-ajax>
+      <iron-ajax
+         auto
+         url="{{domain('/site/curator')}}"
+         handle-as="json"
+         last-response="{{curators}}"
+         debounce-duration="300"></iron-ajax>
+   </template>
+   <script> 	    
+   class MyData extends ReduxMixin(Polymer.Element) {
+       static get is() {
+           return 'my-data';
+       }
+       
+       static get properties() {
+           return {
+        	 site: {
+        		 type: String,
+        		 statePath: 'site'
+        	 },
+             curators: {
+            	 type: Array,
+            	 statPath: 'curators',
+            	 observer: 'curatorsChanged'
+             },
+             leagues: {
+            	 type: Array,
+            	 statPath: 'leagues',
+            	 observer: 'leaguesChanged'            	
+             }           
+           }
+         }
+       static get actions() {
+    	   return {
+    		   updateCurators(curators) {
+    			   return  {
+    				   type: 'UPDATE_CURATORS',
+    				   curators
+    			   }
+    		   },
+    		   updateLeagues(leagues) {
+    			   return  {
+    				   type: 'UPDATE_LEAGUES',
+    				   leagues
+    			   }
+    		   }    		   
+    	   };
+       }
+       curatorsChanged(curators) {
+    	   this.dispatch('updateCurators', curators);
+    	   
+       }
+       leaguesChanged(leagues) {
+    	   this.dispatch('updateLeagues', leagues);
+       }             
+
+       domain(url) {
+           return '//' + nativeDomain() + url
+       }
+   }
+
+   customElements.define(MyData.is, MyData);
+   </script>
+</dom-module>

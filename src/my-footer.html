@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 
+<link rel="import" href="redux-mixin.html">
 
 <dom-module id="my-footer">
    <template>
@@ -20,8 +21,11 @@
          .navbutton {
          	pointer-events: initial;
          }	
+         paper-fab {
+         	background: var(--paper-grey-700);  
+         }
       </style>        
-      <footer class$="{{checkflush(selected)}}">
+      <footer class$="[[checkflush(selected, menu)]]">
          <paper-fab icon="chevron-left"
          	mini 
             class="navbutton" 
@@ -35,29 +39,36 @@
             on-click="next"></paper-fab>
       </footer>
    </template>
-   <script>
-      Polymer({
-        is: 'my-footer', 
-        updateSelected: function (ns) {
-        	document.querySelector('my-app').shadowRoot.querySelector('#mylistbox').selected = ns;
-        },
-        next: function () {
-        	var ns = Math.min(document.querySelector('my-app').shadowRoot.querySelector('#mylistbox').items.length -1, document.querySelector('my-app').selected) + 1
-        	this.updateSelected(ns);
-        },
-        prev: function () {
-        	var ns = Math.max(1, document.querySelector('my-app').selected) - 1;
-        	this.updateSelected(ns);
-        },        
-        checkflush: function(ign) {
-        	//console.log('selected to:', ign)
-        	if (this.selected == 0 ) { 
-        		return "flushleft" 
-        	} else if (document.querySelector('my-app').selected == document.querySelector('my-app').shadowRoot.querySelector('#mylistbox').items.length - 1 ) { 
-        		return "flushright" 
-        	}
-        	return "";
+   <script>   	  
+   	  class MyFooter extends SelectedMixin(Polymer.Element) {   
+      
+        static get is() { return 'my-footer'}
+        
+        static get properties() {
+          return {
+            menu: {
+          	  type: Array,
+          	  statePath: 'menu'
+            }            
+          };
+        }                
+        next() {
+        	this.dispatch('updateSelected', this.selected + 1);
         }
-      });
+        prev() {
+        	this.dispatch('updateSelected', this.selected - 1);
+        }        
+        checkflush(selected, menu) {
+        	if ( menu ) {
+        		if (selected == 0 ) { 
+            		return "flushleft" 
+            	} else if (menu.length - 1 == selected) { 
+            		return "flushright" 
+            	}	
+        	}        	        	
+        	return "";
+        }                       
+      }
+   	customElements.define(MyFooter.is, MyFooter);
    </script>
 </dom-module>

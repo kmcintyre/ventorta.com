@@ -1,0 +1,261 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/av-icons.html">
+
+<link rel="import" href="redux-mixin.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-instances">
+   <template>
+      <style include="shared-styles iron-flex iron-flex-alignment">
+         :host {         	
+         	--paper-card: {
+	        margin: 12px 6px 12px 6px;
+	        width: 300px;
+	        text-align:left;
+	      }	
+         }   
+	     .space {
+	     	margin-right: 5px;
+	     }
+		 paper-fab.retracted ~ div {		 	
+		 	display:none;
+		 }		 
+		 paper-fab.changed ~ div:nth-of-type(1) {		 	
+		 	display:none;
+		 }		 
+		 paper-fab.extended ~ div:nth-of-type(2) {		 	
+		 	display:none;
+		 }
+		.container > paper-fab[disabled] {
+			background: var(--paper-grey-300); 
+		 }		 		 
+		 .container > paper-fab:not(disabled) {
+		 	background: #4CAF50;
+		 }
+		 .container {
+		 	width:100%
+		 }
+		 .container {
+    		@apply(--layout-horizontal);
+    		@apply(--layout-center);
+    	 }
+    	 .inner {
+    		@apply(--layout-horizontal);    		    		      	
+		 }
+		 .action {
+		 	@apply(--layout-flex);
+		 }
+		 .inner paper-item {
+		 	padding: 0px 8px;
+		 }
+		 .instance {
+		 	pointer: cursor;
+		 } 
+      </style>
+      		<iron-ajax
+                     auto
+                     url="{{domain('/site/all/instances')}}"
+                     handle-as="json"
+                     last-response="{{instances}}"
+                     debounce-duration="300"></iron-ajax>
+                  <template is="dom-repeat" items="[[instances]]" as="instance">
+                     <paper-card>                     
+                     	<paper-item><span class="instance space" on-click="launch"></span><span class="name space">{{instance.tag}}</span></paper-item>
+                     	<div class="container">
+                     		<paper-fab class="label retracted" label="{{balance(instance)}}" title="balance" on-click="extend"></paper-fab>                           	                     	          						
+   							<div class="inner">   							
+   								<template is="dom-repeat" items="[[acts]]" as="act">
+   									<paper-item>
+   										<paper-fab mini 
+   												icon="[[act.icon]]" 
+   												title="[[act.title]]"
+   												data-instance-id$="[[instance.id]]"
+   												data-tag$="[[instance.tag]]"   												
+   												on-click="action"
+   												data-action$="[[act.action]]"
+   												disabled="{{disable(act, instance)}}"></paper-fab>   												
+   									</paper-item>
+   								</template>
+        					</div>
+        					<div class="inner action">
+        						<span></span>        						        					
+        					</div>
+   						</div>
+                        <paper-item>Launch: <span class="calendar space"></span>{{date(instance.launch_time)}}</paper-item>
+						<template is="dom-if" if="{{isSite(instance)}}">
+							site
+							<template is="dom-repeat" items="{{league(instance)}}" as="league">
+								league
+							</template>							
+						</template>                       
+                        <textarea style="display:none; width:100%; height:100px">{{stringify(instance)}}</textarea>
+                     </paper-card>
+                  </template>
+   </template>
+   <script> 
+ 	 function closest(el, selector) {
+   	     if (!el || !el.parentElement) return null
+   	     else if (el.parentElement.matches(selector)) return el.parentElement
+   	     else return closest(el.parentElement, selector)
+   	 }
+
+   	 class MyInstances extends ReduxMixin(Polymer.Element) {
+   	     static get is() {
+   	         return 'my-instances';
+   	     }
+   	     static get properties() {
+   	         return {
+   	             curators: {
+   	                 type: Array,
+   	                 statePath: 'curators'
+   	             },
+   	             leagues: {
+   	                 type: Array,
+   	                 statePath: 'leagues'
+   	             },
+   	             instances: {
+   	                 type: Array
+   	             },
+   	             acts: {
+   	                 type: Array,
+   	                 value: [{
+   	                         icon: 'maps:local-hospital',
+   	                         title: 'Replace',
+   	                         notag: true,
+   	                         action: 'Replacing'
+   	                     },
+   	                     {
+   	                         icon: 'cached',
+   	                         title: 'Reboot',
+   	                         disable: ['stopped'],
+   	                         action: 'Rebooting'
+   	                     },
+   	                     {
+   	                         icon: 'av:stop',
+   	                         title: 'Stop',
+   	                         disable: ['stopped'],
+   	                         action: 'Stopping'
+   	                     },
+   	                     {
+   	                         icon: 'av:play-arrow',
+   	                         title: 'Start',
+   	                         disable: ['running'],
+   	                         action: 'Starting'
+   	                     }
+   	                 ]
+   	             }
+   	         }
+   	     }
+   	     league(instance) {
+   	    	 console.log('instance', instance, this.leagues)
+   	    	 if ( this.leagues ) {
+   	    		 var l = this.leagues.filter(function(l) { return l.league == instance.tag.split('.')[0] })
+   	    		 console.log(l)
+   	    		return 	 l
+   	    	 }
+   	    	 return [];
+   	     }
+   	     isSite(instance) {
+   	    	return instance.tag.split('.').length == 3
+   	     }
+   	     disable(act, instance) {
+   	         if (act.notag && instance.tag == 'untagged' || (act.disable && act.disable.indexOf(instance.state)) > -1) {
+   	             return true;
+   	         }
+   	         return false;
+   	     }
+   	     action(event) {
+   	         var up = {
+   	             id: event.target.dataset.instanceId,
+   	             perform: event.target.title.toLowerCase(),
+   	             tag: event.target.dataset.tag
+   	         };
+   	         if (up.tag.split('.').length == 3) {
+   	             up.destination = 'http://service.' + up.tag.substring(up.tag.indexOf('.') + 1)
+   	         } else {
+   	             up.destination = 'http://service.scewpt.com'
+   	         }
+   	         up.destination += '/site/instances';
+   	         var container = closest(event.target.parentNode, '.container');
+   	         var pf = container.querySelector('paper-fab');
+   	         pf.disabled = true;
+   	         pf.classList.remove("extended");
+   	         pf.classList.add("changed");
+   	         console.log(event.target.dataset.action)
+   	         container.querySelector('.inner.action span').innerHTML = event.target.dataset.action
+
+   	         var request = new Request(up.destination, {
+   	         	method: 'POST', 
+   	         	mode: 'cors',
+   	         	body: JSON.stringify(up)
+   	         });
+   	         
+   	         fetch(request).then(function (ans) {
+   	         	console.log('ans:', ans)
+   	         })   	         
+   	     }
+   	     launch(event) {
+   	         var site = event.target.parentNode.querySelector('span.name').innerHTML;
+   	         if (site.split('.').length == 3) {
+   	             window.open('http://' + site, '_blank');
+   	         } else if (site == 'mail') {
+   	             window.open('http://www.scewpt.com/inbox/index.html', '_blank');
+   	         } else if (site.indexOf('service') > -1) {
+   	             window.open('http://service.ventorta.com', '_blank');
+   	         }
+   	     }
+   	     extend(event) {
+   	         console.log('extend:', event.target.className)
+   	         if (event.target.classList.contains('retracted')) {
+   	             event.target.classList.remove("retracted");
+   	             event.target.classList.add("extended");
+   	         } else {
+   	             event.target.classList.remove("extended");
+   	             event.target.classList.add("retracted");
+   	         }
+   	     }
+   	     extendedClass(index) {
+   	         if (this.instances && this.instances[index].extended) {
+   	             return 'extended';
+   	         }
+   	         return 'retracted';
+   	     }
+   	     balance(instance) {
+   	         if (instance.balance) {
+   	             return parseInt(instance.balance)
+   	         } else {
+   	             return 0
+   	         }
+   	     }
+   	     date(t) {
+   	         var d = new Date(t * 1000)
+   	         if (d.toLocaleDateString() === new Date().toLocaleDateString()) {
+   	             return d.toLocaleTimeString()
+   	         } else {
+   	             return d.toLocaleDateString().split('/')[0] + '/' + d.toLocaleDateString().split('/')[1];
+   	         }
+   	     }
+
+   	     curation(data, index, name) {
+   	         return data[index][name];
+   	     }
+   	     domain(url) {
+   	         return '//' + nativeDomain() + url
+   	     }
+   	     stringify(item) {
+   	         return JSON.stringify(item);
+   	     }
+   	 }
+
+   	 customElements.define(MyInstances.is, MyInstances);      
+   </script>
+</dom-module>

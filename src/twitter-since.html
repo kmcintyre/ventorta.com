@@ -4,6 +4,8 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 
+<link rel="import" href="redux-mixin.html">
+
 <dom-module id="twitter-since">
    <template>
       <style>
@@ -97,94 +99,78 @@
       </app-box>
    </template>
    <script>   
-      Polymer({
-        is: 'twitter-since',
-        properties: {
-            tweets: {
-              type: Array,
-              value: [],
-              notify: true
-            }
-        },
-        _toString: function (item) {
-        	return JSON.stringify(item)
-        },
-        _toValuation: function(v) {
-        	return v.valuation.substring(1, v.valuation.indexOf(' '))
-        },
-        _toKeys: function(obj) {
-            return Object.keys(obj);
-        },        
-        isLeague: function(tweet, league_name) {
-        	return tweet.league === league_name;
-        },
-        domain: function (item) {
-        	return 'http://' + nativeDomain() + '/' + item.league + '/large/' + item.twitter + '.png'        	
-        }, 
-        addtweet: function(tweet, end) {
-        	this.notifyPath('tweets', end ? this.tweets.concat(tweet) : [tweet].concat(this.tweets))
-        },
-        ready: function() {
-     	    var cs = document.querySelector('my-app').shadowRoot.querySelector('#chartsocial');
-    	    var ws = document.querySelector('my-app').shadowRoot.querySelector('#websocket');        	
-        	
-    	    Promise.all([
-         	new Promise((resolve, reject) => {
-         		new MutationObserver(function(mutations) {        		
-             		mutations.forEach(function(mutation) {
-             			if (ws.state == "1" ) {
-             				console.log('websocket up')
-             				resolve(true)	
-             			}
-             		});    
-             	}).observe(ws, {
-                		attributes: true, 
-                		childList: false, 
-                		characterData: false 
-                	});	        		
-         	}), 
-         	new Promise((resolve, reject) => {	        		
-             	new MutationObserver(function(mutations) {        		
-             		mutations.forEach(function(mutation) {
-             			if (mutation.attributeName == 'end') {
-             				console.log('chart rendered')
-             				resolve(true)
-             			}
-             		});    
-             	}).observe(cs, {
-                		attributes: true, 
-                		childList: false, 
-                		characterData: false 
-                	});	        		
-        		})
-        	]).then(values => {      		
-       		   document.querySelector('my-app').addEventListener('onmessage', function (j) {
-       			   var ts = document.querySelector('my-app').shadowRoot.querySelector('#twittersince');
-       			   if ( j.detail.limit ) {
-       				   if ( j.detail.social_ts_received > cs.end ) {           				  
-       					   ts.addtweet(j.detail, true);
-           				   ws.send( JSON.stringify({
-           					   website: nativeDomain(),
-           				       backfill: {
-           				    	   platform: 'twitter',
-           				    	   limit: 'unknown',
-           				    	   tweet_id: j.detail.tweet_id
-           				       }
-           		    	   }));     		           			          					   
-       				   }
-       			   } else if (j.detail.tweet_id) {
-       					ts.addtweet(j.detail, false);
-       			   }
-       		  });           		
-        		ws.send( JSON.stringify({
+   class TwitterSince extends ReduxMixin(Polymer.Element) {
+       static get is() {
+           return 'twitter-since';
+       }	   
+
+       static get properties() {
+           return {
+        	 tweets: {
+               type: Array,
+               statePath: 'tweets',
+               observer: 'tweetsChanged'
+             }, 
+             readyState: {
+            	 type: Number,
+                 statePath: 'readyState',
+                 observer: 'backfill'
+             }
+         } 
+       }
+
+       static get actions() {
+           return {
+        	   websocketRequest(request) {
+                   return {
+                       type: 'WEBSOCKET_REQUEST',
+                       request
+                     };					        		   
+        	   }
+           }
+       }
+       tweetsChanged(tweets) {
+    	   console.log(tweets, tweets.length)
+    	   if ( tweets.length > 0 && tweets.length < 20 ) {
+    		   this.dispatch('websocketRequest', {
+					website: nativeDomain(),
+					backfill: {
+				    	   platform: 'twitter',
+				    	   limit: 'unknown',
+				    	   tweet_id: tweets[tweets.length-1].tweet_id
+					}
+			   })
+    	   }
+       }
+       
+       backfill(readyState) {
+    	   if ( readyState == 1) {
+    		   this.dispatch('websocketRequest', {
             	   website: nativeDomain(),
             	   backfill: {
             		   platform: 'twitter',
             		   limit: 'unknown'
             	   }
-               }));
-        	});
+               })    		   
+    	   }
+       }
+       
+        _toString(item) {
+        	return JSON.stringify(item)
         }
-      });
+        _toValuation(v) {
+        	return v.valuation.substring(1, v.valuation.indexOf(' '))
+        }
+        _toKeys(obj) {
+            return Object.keys(obj);
+        }        
+        isLeague(tweet, league_name) {
+        	return tweet.league === league_name;
+        }
+        domain(item) {
+        	return 'http://' + nativeDomain() + '/' + item.league + '/large/' + item.twitter + '.png'        	
+        }        
+      }
+   	customElements.define(TwitterSince.is, TwitterSince);
    </script>
 </dom-module>
