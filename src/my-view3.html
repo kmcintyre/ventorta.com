@@ -1,25 +1,28 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-layout/demo/sample-content.html">
+
+<link rel="import" href="my-instances.html">
 
 <dom-module id="my-view3">
    <template>
       <style>
-         :host {         	
-         }   
+      	:host {}   
+      	#myinstances {
+      		width: 100%;
+	       	text-align: center;
+      	}      	
       </style>
-      <div>
-         <sample-content size="5"></sample-content>
-      </div>
+      <div id="myinstances">
+	  	<my-instances></my-instances>
+	  </div>
    </template>
    <script>
 		class MyView3 extends Polymer.Element {
 		  static get is() { return 'my-view3'; }
 		  constructor() {
 		    super();
+		    console.log('my view 3:', store)
 		  }
-		}      
-      
-      	customElements.define(MyView3.is, MyView3);
-      
+		}            
+      	customElements.define(MyView3.is, MyView3);      
    </script>
 </dom-module>

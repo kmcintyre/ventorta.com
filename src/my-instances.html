@@ -23,9 +23,6 @@
 	        text-align:left;
 	      }	
          }   
-	     .space {
-	     	margin-right: 5px;
-	     }
 		 paper-fab.retracted ~ div {		 	
 		 	display:none;
 		 }		 
@@ -58,8 +55,17 @@
 		 	padding: 0px 8px;
 		 }
 		 .instance {
-		 	pointer: cursor;
-		 } 
+		 	cursor: pointer;
+		 }
+		 .dates div {
+		 	@apply(--layout-flex);
+		 }
+		 .dates div {
+		 	padding: 4px
+		 }
+		 .dates div:nth-child(2) {
+		 	direction: rtl;
+		 }
       </style>
       		<iron-ajax
                      auto
@@ -69,7 +75,7 @@
                      debounce-duration="300"></iron-ajax>
                   <template is="dom-repeat" items="[[instances]]" as="instance">
                      <paper-card>                     
-                     	<paper-item><span class="instance space" on-click="launch"></span><span class="name space">{{instance.tag}}</span></paper-item>
+                     	<paper-item><span class="instance rspace" on-click="launch"></span><span class="name space">{{instance.tag}}</span></paper-item>
                      	<div class="container">
                      		<paper-fab class="label retracted" label="{{balance(instance)}}" title="balance" on-click="extend"></paper-fab>                           	                     	          						
    							<div class="inner">   							
@@ -90,7 +96,11 @@
         						<span></span>        						        					
         					</div>
    						</div>
-                        <paper-item>Launch: <span class="calendar space"></span>{{date(instance.launch_time)}}</paper-item>
+   						<div class="horizontal layout dates">
+   							<div>Launch<span class="calendar rspace lspace"></span>{{date(instance.launch_time)}}</div>
+   							<div>Reboot<span class="calendar rspace lspace"></span>{{tag(instance, 'Reboot')}}</div>
+   						</div>
+                        
 						<template is="dom-if" if="{{isSite(instance)}}">
 							site
 							<template is="dom-repeat" items="{{league(instance)}}" as="league">
@@ -156,11 +166,8 @@
    	         }
    	     }
    	     league(instance) {
-   	    	 console.log('instance', instance, this.leagues)
    	    	 if ( this.leagues ) {
-   	    		 var l = this.leagues.filter(function(l) { return l.league == instance.tag.split('.')[0] })
-   	    		 console.log(l)
-   	    		return 	 l
+   	    		 return this.leagues.filter(function(l) { return l.league == instance.tag.split('.')[0] })
    	    	 }
    	    	 return [];
    	     }
@@ -173,6 +180,18 @@
    	         }
    	         return false;
    	     }
+   	     tag(instance, name) {
+   	    	var value = instance.tags[name] 
+   	    	if ( value ) {
+   	    		return this.date(value)
+   	    	} else {
+   	    		value = instance.tags[name.toLowerCase()]
+   	    		if ( value ) {
+   	    			return this.date(value)
+   	    		}   	    		
+   	    	}
+   	    	return 'unknown'
+   	     }
    	     action(event) {
    	         var up = {
    	             id: event.target.dataset.instanceId,
@@ -182,8 +201,9 @@
    	         if (up.tag.split('.').length == 3) {
    	             up.destination = 'http://service.' + up.tag.substring(up.tag.indexOf('.') + 1)
    	         } else {
-   	             up.destination = 'http://service.scewpt.com'
+   	             up.destination = 'http://service.' + nativeDomain();
    	         }
+   	         
    	         up.destination += '/site/instances';
    	         var container = closest(event.target.parentNode, '.container');
    	         var pf = container.querySelector('paper-fab');
@@ -239,14 +259,12 @@
    	     date(t) {
    	         var d = new Date(t * 1000)
    	         if (d.toLocaleDateString() === new Date().toLocaleDateString()) {
-   	             return d.toLocaleTimeString()
+   	        	 var t = d.toLocaleTimeString();
+   	        	 
+   	             return t.split(':')[0] + ':' + t.split(':')[1] + ' ' + t.split(' ')[1] 
    	         } else {
    	             return d.toLocaleDateString().split('/')[0] + '/' + d.toLocaleDateString().split('/')[1];
    	         }
-   	     }
-
-   	     curation(data, index, name) {
-   	         return data[index][name];
    	     }
    	     domain(url) {
    	         return '//' + nativeDomain() + url

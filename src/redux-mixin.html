@@ -40,10 +40,12 @@
  const store = Redux.createStore(reducer, {
 	site: nativeDomain(),
 	lingo: JSON.parse(document.querySelector('meta[name="lingo"]').getAttribute('content')),
-	selected: 3,
-	menu: [{name: 'Throughput'}, {name: 'Entities'}, {name: 'Stream'}, {name: 'Systems'}],
+	selected: 4,
+	menu: [{name: 'Throughput'}, {name: 'Entities'}, {name: 'Stream'}, {name: 'Systems'}, {name: 'Match'}],
 	tweets: [],
-	requests: []
+	requests: [],
+	curators: [],
+	leagues: []	
  });	            
  const ReduxMixin = PolymerRedux(store)
  

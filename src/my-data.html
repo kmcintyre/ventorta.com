@@ -13,13 +13,13 @@
       </style>
       <iron-ajax
          auto
-         url="{{domain('/site/leagues')}}"
+         url="{{domain('/site/all/leagues')}}"
          handle-as="json"
          last-response="{{leagues}}"
          debounce-duration="300"></iron-ajax>
       <iron-ajax
          auto
-         url="{{domain('/site/curator')}}"
+         url="{{domain('/site/all/curators')}}"
          handle-as="json"
          last-response="{{curators}}"
          debounce-duration="300"></iron-ajax>
@@ -38,12 +38,10 @@
         	 },
              curators: {
             	 type: Array,
-            	 statPath: 'curators',
             	 observer: 'curatorsChanged'
              },
              leagues: {
             	 type: Array,
-            	 statPath: 'leagues',
             	 observer: 'leaguesChanged'            	
              }           
            }

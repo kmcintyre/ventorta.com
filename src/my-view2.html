@@ -1,8 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/app-layout/demo/sample-content.html">
 
-<link rel="import" href="redux-mixin.html">
-
 <dom-module id="my-view2">
    <template>
       <style>
@@ -10,21 +8,18 @@
          }   
       </style>
       <div>
-         <sample-content size="{{leagues.length}}"></sample-content>
+         <sample-content size="5"></sample-content>
       </div>
    </template>
    <script>
-		class MyView2 extends ReduxMixin(Polymer.Element) {
+		class MyView2 extends Polymer.Element {
 		  static get is() { return 'my-view2'; }
-		  static get properties() {
-			  return {
-				leagues: {
-					type: Array,
-					statePath: 'leagues'
-				}  
-			  }
+		  constructor() {
+		    super();
 		  }
-		}            
-      	customElements.define(MyView2.is, MyView2);      
+		}      
+      
+      	customElements.define(MyView2.is, MyView2);
+      
    </script>
 </dom-module>

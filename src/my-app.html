@@ -17,7 +17,6 @@
 <link rel="import" href="my-footer.html">
 <link rel="import" href="my-listbox.html">
 
-
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-app">
@@ -132,35 +131,38 @@
                </app-toolbar>
                <div id="stats">
                   <ul>
-                     <li class="trans">
-                        <span class="entities"></span>
+                  <template is="dom-repeat" items="{{curators}}" filter="isCurator" as="curator">                  
+                     <li class="trans">                     	
+                        <span class="entity"></span>
                         <span>
-                        {{curation(curators, 0, 'entity_count')}}
+                        {{number_twitter(curator.entity_count)}}
                         </span>
                      <li class="trans">
                         <span class="twitter"></span>
                         <span>
-                        {{curation(curators, 0, 'twitter_count')}}
+                        {{number_twitter(curator.twitter_count)}}
                         </span>
                      <li class="trans">
                         <span class="facebook"></span>
                         <span>
-                        {{curation(curators, 0, 'facebook_count')}}
+                        {{number_twitter(curator.facebook_count)}}
                         </span>
                      <li class="trans">
                         <span class="instagram"></span>
                         <span>
-                        {{curation(curators, 0, 'instagram_count')}}
+                        {{number_twitter(curator.instagram_count)}}
                         </span>
                      <li>
+                  	</template>
                   </ul>
                </div>
             </app-header>
             <iron-pages selected="[[selected]]">
-	           <my-view1 name="view1"></my-view1>
-	           <my-view2 name="view2"></my-view2>
-	           <my-view3 name="view3"></my-view3>
-	           <my-view4 name="view4"></my-view4>               
+               <my-view0></my-view0>
+	           <my-view1></my-view1>
+	           <my-view2></my-view2>
+	           <my-view3></my-view3>
+	           <my-view4></my-view4>               
             </iron-pages>
             <my-footer id="myfooter" selected="[[selected]]"></my-footer>
          </app-header-layout>
@@ -186,32 +188,15 @@
              },
              curators: {
             	 type: Array,
-            	 statPath: 'curators',
-            	 observer: 'curatorsChanged'
+            	 statePath: 'curators'
              },
              leagues: {
             	 type: Array,
-            	 statPath: 'leagues',
-            	 observer: 'leaguesChanged'            	
+            	 statePath: 'leagues'            	
              }           
            }
          }
-       static get actions() {
-    	   return {
-    		   updateCurators(curators) {
-    			   return  {
-    				   type: 'UPDATE_CURATORS',
-    				   curators
-    			   }
-    		   },
-    		   updateLeagues(leagues) {
-    			   return  {
-    				   type: 'UPDATE_LEAGUES',
-    				   leagues
-    			   }
-    		   }    		   
-    	   };
-       }
+
        ready() {
            super.ready();
            Polymer.RenderStatus.afterNextRender(this, function() {
@@ -226,9 +211,9 @@
                }, true);               
            });
        }     
-
+	       
        selectedChanged(selected) {
-           var resolvedPageUrl = this.resolveUrl('my-view' + (selected + 1) + '.html');
+           var resolvedPageUrl = this.resolveUrl('my-view' + selected + '.html');
            console.log('selected:', selected, resolvedPageUrl)
            Polymer.importHref(
                resolvedPageUrl,
@@ -237,9 +222,14 @@
                true
            );
        }
-       
+       isCurator(data) {
+    	   if ( data.role == nativeDomain() ) {
+    		   return true;
+    	   }
+    	   return false
+       }
        curation(data, index, name) {
-           return this.number_twitter(data[index][name]);
+    	   return this.number_twitter(data[index][name]);
        }
        domain(url) {
            return '//' + nativeDomain() + url
@@ -255,9 +245,6 @@
 				return '' + tn;
 			}
 	   }       
-       connectedCallback() {
-           super.connectedCallback();
-       }
    }
 
    customElements.define(MyApp.is, MyApp);
