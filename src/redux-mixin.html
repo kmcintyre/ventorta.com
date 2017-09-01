@@ -18,11 +18,23 @@
 	      return Object.assign({}, state, {
 	    	  leagues: action.leagues
 	    });		      
+	    case 'UPDATE_OPERATORS':
+		      return Object.assign({}, state, {
+		    	  operators: action.operators
+		    });	      
 	    case 'WEBSOCKET_MESSAGE':
-	    	 if ( action.message.twitter ) {
-		    	 console.log('new tweet:', action)	    		 
+	    	 if ( action.message.twitter ) {	    		 
 				  const tweets = state.tweets.splice(0)
-				  tweets.push(action.message)	    	 
+				  if (typeof action.message.limit !== 'undefined' ) {
+					  console.log('limit message:', action.message.limit, action.message.twitter)
+					  tweets.push(action.message)  
+				  } else if (typeof action.message.twitter !== 'undefined' ) {
+					  console.log('new message:', action.message)
+					  tweets.unshift(action.message)
+				  } else {
+					  console.log('heartbeat');
+					  return state;
+				  }
 			      return Object.assign({}, state, { tweets });	    		 
 	    	 }
 	    	 return state;
@@ -40,15 +52,16 @@
  const store = Redux.createStore(reducer, {
 	site: nativeDomain(),
 	lingo: JSON.parse(document.querySelector('meta[name="lingo"]').getAttribute('content')),
-	selected: 4,
+	selected: 0,
 	menu: [{name: 'Throughput'}, {name: 'Entities'}, {name: 'Stream'}, {name: 'Systems'}, {name: 'Match'}],
 	tweets: [],
 	requests: [],
 	curators: [],
-	leagues: []	
+	leagues: [],
+	opertors: [],
  });	            
  const ReduxMixin = PolymerRedux(store)
- 
+    
  const SelectedMixin = Parent => class SelectedMixin extends ReduxMixin(Parent) {
     
 	static get properties() {
@@ -75,7 +88,7 @@
        if (store.getState().selected != selected) {
      	   this.dispatch('updateSelected', selected)   
        }       
-    }
+    }    
   } 
 </script>
 

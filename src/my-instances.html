@@ -9,6 +9,7 @@
 <link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../bower_components/iron-icons/notification-icons.html">
 
 <link rel="import" href="redux-mixin.html">
 <link rel="import" href="shared-styles.html">
@@ -61,10 +62,14 @@
 		 	@apply(--layout-flex);
 		 }
 		 .dates div {
-		 	padding: 4px
+		 	padding: 4px;
+		 	white-space: nowrap
 		 }
 		 .dates div:nth-child(2) {
-		 	direction: rtl;
+		 	
+		 }
+		 .name {
+		 	 font-size: 1.12em;		 	 
 		 }
       </style>
       		<iron-ajax
@@ -74,7 +79,7 @@
                      last-response="{{instances}}"
                      debounce-duration="300"></iron-ajax>
                   <template is="dom-repeat" items="[[instances]]" as="instance">
-                     <paper-card>                     
+                     <paper-card>
                      	<paper-item><span class="instance rspace" on-click="launch"></span><span class="name space">{{instance.tag}}</span></paper-item>
                      	<div class="container">
                      		<paper-fab class="label retracted" label="{{balance(instance)}}" title="balance" on-click="extend"></paper-fab>                           	                     	          						
@@ -97,16 +102,55 @@
         					</div>
    						</div>
    						<div class="horizontal layout dates">
-   							<div>Launch<span class="calendar rspace lspace"></span>{{date(instance.launch_time)}}</div>
-   							<div>Reboot<span class="calendar rspace lspace"></span>{{tag(instance, 'Reboot')}}</div>
+   							<div class="vertical layout end">
+   								<div>Launch</div>
+   								<div>Reboot</div>
+   								<template is="dom-if" if="{{operators.length > 0 && leagues.length > 0 && curators.length > 0}}">
+	   								<template is="dom-repeat" items="{{operator(instance)}}" as="operator">
+	   									<div>
+	   										<a href="{{bible(instance)}}" target="_blank">Bible</a>	   											   									
+	   									</div>
+	   									<div>Scout</div>
+	   									<div>Match</div>
+	   									<div>Friends</div>
+	   								</template>
+	   							</template>
+   							</div>
+   							<div class="flex" style="text-align:center"><span class="calendar"></span></div>
+							<div class="vertical layout">
+   								<div class="">{{date(instance.launch_time)}}</div>
+   								<div>{{tag(instance, 'Reboot')}}</div>
+   								<template is="dom-if" if="{{operators.length > 0}}">
+	   								<template is="dom-repeat" items="{{operator(instance)}}" as="operator">
+	   									<div>{{date(operator.ts_bible)}}</div>
+	   									<div>{{date(operator.ts_stalked)}}</div>
+	   									<div>{{date(operator.ts_match_twitter)}}</div>
+	   									<div>{{date(operator.ts_inflated)}}</div>
+	   								</template>
+								</template>
+   							</div>
    						</div>
-                        
-						<template is="dom-if" if="{{isSite(instance)}}">
-							site
-							<template is="dom-repeat" items="{{league(instance)}}" as="league">
-								league
-							</template>							
-						</template>                       
+   						<template is="dom-repeat" items="{{operator(instance)}}" as="operator">
+							<div style="width:100%; text-align:center; position:relative;">
+							  <div class="layout horizontal center" style="padding: 2px 12px 2px 12px">								
+									<div class="entity flex">
+										{{number_twitter(operator.entity_count)}}
+									</div>
+									<div class="twitter flex">
+										{{number_twitter(operator.twitter_count)}}
+									</div>								
+									<div class="instagram flex">
+										{{number_twitter(operator.instagram_count)}}
+									</div>								
+									<div class="facebook flex">
+										{{number_twitter(operator.facebook_count)}}
+									</div>										   							
+								</div>
+								<template is="dom-if" if="{{operator.locked}}">
+	   								<iron-icon icon="notification:network-locked" style="position:absolute; right:0px; bottom: 0px; fill: red"></iron-icon>
+								</template>							
+							</div>							   						
+   						</template>
                         <textarea style="display:none; width:100%; height:100px">{{stringify(instance)}}</textarea>
                      </paper-card>
                   </template>
@@ -132,6 +176,10 @@
    	                 type: Array,
    	                 statePath: 'leagues'
    	             },
+   	             operators: {
+   	                 type: Array,
+   	                 statePath: 'operators'
+   	             },   	             
    	             instances: {
    	                 type: Array
    	             },
@@ -165,6 +213,17 @@
    	             }
    	         }
    	     }
+   	     operator(instance) {
+   	    	 if ( this.operators ) {
+   	    		 return this.operators.filter(function(o) { return o.role == instance.tag.split('.')[0] })
+   	    	 }  	    	 
+   	     }
+   	     curator(instance) {
+   	    	 if ( this.curator ) {
+   	    		 return this.curators.filter(function(c) { return c.site_leagues.indexOf(instance.tag.split('.')[0]) > -1 })
+   	    	 }
+   	    	 return [];  	    	 
+   	     }   	     
    	     league(instance) {
    	    	 if ( this.leagues ) {
    	    		 return this.leagues.filter(function(l) { return l.league == instance.tag.split('.')[0] })
@@ -174,6 +233,9 @@
    	     isSite(instance) {
    	    	return instance.tag.split('.').length == 3
    	     }
+   	     bible(instance) {
+   	    	return "http://" + this.curator(instance)[0].role + '/' + this.operator(instance)[0].role + '/db/league.json';
+    	 }   	     
    	     disable(act, instance) {
    	         if (act.notag && instance.tag == 'untagged' || (act.disable && act.disable.indexOf(instance.state)) > -1) {
    	             return true;
@@ -190,7 +252,7 @@
    	    			return this.date(value)
    	    		}   	    		
    	    	}
-   	    	return 'unknown'
+   	    	return this.date()
    	     }
    	     action(event) {
    	         var up = {
@@ -257,21 +319,35 @@
    	         }
    	     }
    	     date(t) {
-   	         var d = new Date(t * 1000)
-   	         if (d.toLocaleDateString() === new Date().toLocaleDateString()) {
-   	        	 var t = d.toLocaleTimeString();
-   	        	 
-   	             return t.split(':')[0] + ':' + t.split(':')[1] + ' ' + t.split(' ')[1] 
-   	         } else {
-   	             return d.toLocaleDateString().split('/')[0] + '/' + d.toLocaleDateString().split('/')[1];
-   	         }
+   	    	 if ( t ) {
+   	    		var d = new Date(t * 1000)
+  	   	         if (d.toLocaleDateString() === new Date().toLocaleDateString()) {
+  	   	        	 var t = d.toLocaleTimeString();
+  	   	        	 
+  	   	             return t.split(':')[0] + ':' + t.split(':')[1] + ' ' + t.split(' ')[1] 
+  	   	         } else {
+  	   	             return d.toLocaleDateString().split('/')[0] + '/' + d.toLocaleDateString().split('/')[1];
+  	   	         }
+   	    	 }
+   	    	 return '';
    	     }
    	     domain(url) {
-   	         return '//' + nativeDomain() + url
+   	         return '//service.' + nativeDomain() + url
    	     }
    	     stringify(item) {
    	         return JSON.stringify(item);
    	     }
+   	  	 number_twitter(tn) {
+			if ( tn == 0 ) {
+				return '0';
+			} else if ( tn / 1000000 >= 1 ) {
+				return '' + parseInt(tn / 1000000) + '.' + parseInt((tn % 1000000)/10000) + 'M';
+			} else if ( tn / 1000 >= 1) {
+				return '' + parseInt(tn / 1000) + '.' + parseInt((tn % 1000)/100) + 'K';		
+			} else {
+				return '' + tn;
+			}
+	   }   	     
    	 }
 
    	 customElements.define(MyInstances.is, MyInstances);      

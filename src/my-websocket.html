@@ -42,7 +42,6 @@
 	    	  }
 	      };
 
-
 	    static get actions() {
 	        return {
 	         websocketMessage(message) {
@@ -52,13 +51,14 @@
 	            };
 	          },
 	          websocketReady(readyState) {
+	        	  console.log('readyState:', readyState)
 	            return {
 	              type: 'WEBSOCKET_READY',
 	              readyState
 	            };
 	          }
 	        };
-	      }  
+	      }  	    
 		  
 	      onError(error) {
 	          this.fire('onerror', error);

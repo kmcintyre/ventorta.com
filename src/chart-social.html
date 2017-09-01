@@ -8,18 +8,17 @@
 <link rel="import" href="../bower_components/google-chart/google-chart.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 
+<link rel="import" href="shared-styles.html">
+
 <dom-module id="chart-social">
    <template>
-      <style>
+      <style include="shared-styles">
          :host {
          	height: 200px
       	 } 
          google-chart {
          	width: 100%;
          }   
-    	.hidden {
-     		display:none;
-    	 }             
     	 paper-progress {
     	 	--paper-progress-active-color: #2196f3;
     	 	width:100%

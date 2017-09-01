@@ -2,11 +2,13 @@
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
 <link rel="import" href="redux-mixin.html">
 
 <dom-module id="my-listbox">
    <template>
-      <style>
+      <style include="iron-flex iron-flex-alignment">
          :host {
          --app-drawer-width: 200px;
          }      
@@ -61,6 +63,7 @@
          display: none;
          }           
       </style>
+      
       <paper-listbox selected="{{selected}}">
          <template is="dom-repeat" items="[[menu]]">
             <paper-item name$="[[item]]" class="toc-item">
@@ -71,6 +74,7 @@
             </paper-item>
          </template>
       </paper-listbox>
+      
    </template>
    <script>
    class MyListbox extends SelectedMixin(Polymer.Element) {

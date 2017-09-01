@@ -130,31 +130,34 @@
                   </div>
                </app-toolbar>
                <div id="stats">
-                  <ul>
-                  <template is="dom-repeat" items="{{curators}}" filter="isCurator" as="curator">                  
-                     <li class="trans">                     	
-                        <span class="entity"></span>
-                        <span>
-                        {{number_twitter(curator.entity_count)}}
-                        </span>
-                     <li class="trans">
-                        <span class="twitter"></span>
-                        <span>
-                        {{number_twitter(curator.twitter_count)}}
-                        </span>
-                     <li class="trans">
-                        <span class="facebook"></span>
-                        <span>
-                        {{number_twitter(curator.facebook_count)}}
-                        </span>
-                     <li class="trans">
-                        <span class="instagram"></span>
-                        <span>
-                        {{number_twitter(curator.instagram_count)}}
-                        </span>
-                     <li>
-                  	</template>
-                  </ul>
+                  
+                  <template is="dom-if" if="{{curators.length > 0}}">
+                  	<ul>
+	                  <template is="dom-repeat" items="{{curators}}" filter="isCurator" as="curator">                  
+	                     <li class="trans">                     	
+	                        <span class="entity"></span>
+	                        <span>
+	                        {{number_twitter(curator.entity_count)}}
+	                        </span>
+	                     <li class="trans">
+	                        <span class="twitter"></span>
+	                        <span>
+	                        {{number_twitter(curator.twitter_count)}}
+	                        </span>
+	                     <li class="trans">
+	                        <span class="facebook"></span>
+	                        <span>
+	                        {{number_twitter(curator.facebook_count)}}
+	                        </span>
+	                     <li class="trans">
+	                        <span class="instagram"></span>
+	                        <span>
+	                        {{number_twitter(curator.instagram_count)}}
+	                        </span>
+	                     <li>
+	                  	</template>
+	                  </ul>
+	              </template>                  
                </div>
             </app-header>
             <iron-pages selected="[[selected]]">
@@ -222,11 +225,8 @@
                true
            );
        }
-       isCurator(data) {
-    	   if ( data.role == nativeDomain() ) {
-    		   return true;
-    	   }
-    	   return false
+       isCurator(c) {
+    	   return c.role == nativeDomain()
        }
        curation(data, index, name) {
     	   return this.number_twitter(data[index][name]);
@@ -234,7 +234,7 @@
        domain(url) {
            return '//' + nativeDomain() + url
        }
-	   number_twitter(tn) {
+ 	   number_twitter(tn) {
 			if ( tn == 0 ) {
 				return '0';
 			} else if ( tn / 1000000 >= 1 ) {
@@ -244,7 +244,7 @@
 			} else {
 				return '' + tn;
 			}
-	   }       
+	   }
    }
 
    customElements.define(MyApp.is, MyApp);
