@@ -2,13 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ventorta.com</title>
+    <title></title>
     <link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet"> 
     
     <link href="/script/css/font-awesome.min.css" rel="stylesheet">
-    <meta name="description" content="Featuring tweets from federal elected officials - The President on down">
-	<meta name="keywords" content="Governors, Congress, White House and select Correspondents">
 	
 	<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
@@ -18,9 +16,11 @@
 
     <link rel="icon" href="images/favicon.ico">
     
-    <meta name="application-name" content="Ventorta.com - Streaming Market Analytics">
+    <meta name="application-name">
 
     <!-- See https://goo.gl/OOhYW5 
+    <meta name="description" content="Featuring tweets from federal elected officials - The President on down">
+	<meta name="keywords" content="Governors, Congress, White House and select Correspondents">
     <link rel="manifest" href="manifest.json">
     -->
 
@@ -65,6 +65,8 @@
               return document.domain
           }          
       }      
+      document.querySelector('title').innerHTML = nativeDomain() 
+      document.querySelector('meta[name="application-name"]').setAttribute('content', nativeDomain() + ' - Streaming Market Analytics')
     </script>
 
     <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>    
