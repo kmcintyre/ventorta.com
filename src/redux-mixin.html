@@ -52,7 +52,7 @@
  const store = Redux.createStore(reducer, {
 	site: nativeDomain(),
 	lingo: JSON.parse(document.querySelector('meta[name="lingo"]').getAttribute('content')),
-	selected: 0,
+	selected: 1,
 	menu: [{name: 'Throughput'}, {name: 'Entities'}, {name: 'Stream'}, {name: 'Systems'}, {name: 'Match'}],
 	tweets: [],
 	requests: [],

@@ -1,18 +1,74 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-layout/demo/sample-content.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+
 
 <link rel="import" href="redux-mixin.html">
+<link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
    <template>
-      <style>
-         :host {         	
-         }   
+      <style include="shared-styles iron-flex iron-flex-alignment">
+         :host {  
+         }
+         .test {       	
+         	border: 5px solid var(--paper-green-200);
+         	padding: 5px;
+         	margin: 10px;
+         	@apply(--layout-horizontal);
+         }
+         paper-checkbox {
+         	@apply(--layout-flex);
+         }
+         paper-checkbox .subtitle {
+           display: block;
+           font-size: 0.8em;
+           margin-top: 2px;
+           max-width: 150px;
+         }
+         .filtered {
+           width: 50px
+         }
+         
       </style>
-      <div>
-         <sample-content size="{{leagues.length}}"></sample-content>
-      </div>
+      	<div class="test">
+		<template is="dom-repeat" items="{{ networks }}" as="network">      	
+    	<paper-checkbox on-change="checkboxChanged" checked="{{ network.checked }}" network$="{{ network.name }}">
+	  	  {{ network.name }}
+	  	  <span class="subtitle">
+	    	{{ network.subtitle }}
+	  	  </span>
+		</paper-checkbox>   
+      	</template>      	
+      	</div>
+      	
+      	<div class="filtered">
+      		{{ filteredPlayers.length }}
+      	</div>
+      	<iron-list items="{{ filteredPlayers }}" as="player" scroll-target="document">
+      		<template>
+	   	  		<div class="player">
+	   	  			{{ player.profile }} {{ player.twitter }}
+	   	  			<template is="dom-if" if="{{ player.twitter }}">
+	   	  				<div><img src="http://{{ player.site }}/{{ player.league }}/large/{{ player.twitter }}.png"></div>	   	  				
+	   	  			</template>
+	   	  		</div>
+	   	  	</template>
+      	</iron-list>
+  		<iron-ajax
+            auto
+            url="{{domain('/site/players')}}"
+            handle-as="json"
+            on-response="handleResponse"
+            debounce-duration="300"></iron-ajax>      
    </template>
+   
    <script>
 		class MyView1 extends ReduxMixin(Polymer.Element) {
 		  static get is() { return 'my-view1'; }
@@ -21,9 +77,55 @@
 				leagues: {
 					type: Array,
 					statePath: 'leagues'
-				}  
+				},
+				networks: {
+						type: Array,
+						value: [
+						{name: 'twitter', 
+						checked: true,
+						subtitle: 'd-oh'
+						}, 
+						{name: 'instagram', 
+						checked: false, 
+						subtitle: 'd-oh2'}, 
+						{name: 'facebook', 
+						checked: false, 
+						subtitle: 'd-oh2'}
+						]
+				},
+				players: {
+					type: Array
+				},				
+				filteredPlayers: {
+					type: Array,
+					value: []
+				}
 			  }
 		  }
+		  updateFilteredPlayers() {
+			  if ( !this.players && !this.networks && !this.networks ) { this.filteredPlayers = [] }			  
+			  var checkboxes = this.shadowRoot.querySelectorAll('paper-checkbox');
+			  this.filteredPlayers = this.players.filter(function (p) {
+				  var f = true;
+				  [].forEach.call(checkboxes, function(checkbox) {
+					  if ( checkbox.checked && typeof p[checkbox.getAttribute('network')] === 'undefined' ) {						  
+						  f = false;
+					  }
+				  });
+				  return f;
+			  })
+			  console.log('new filter players:', this.filteredPlayers.length)
+		  }
+		  checkboxChanged(event) {
+			  this.updateFilteredPlayers();
+		  }
+		  handleResponse(data) {
+			this.players = data.detail.response;
+			this.updateFilteredPlayers();			
+		  }
+   	      domain(url) {
+   	         return '//' + nativeDomain() + url
+   	      }
 		}            
       	customElements.define(MyView1.is, MyView1);      
    </script>

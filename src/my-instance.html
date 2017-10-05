@@ -3,7 +3,6 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
@@ -14,7 +13,7 @@
 <link rel="import" href="redux-mixin.html">
 <link rel="import" href="shared-styles.html">
 
-<dom-module id="my-instances">
+<dom-module id="my-instance">
    <template>
       <style include="shared-styles iron-flex iron-flex-alignment">
          :host {         	
@@ -72,14 +71,7 @@
 		 	 font-size: 1.12em;		 	 
 		 }
       </style>
-      		<iron-ajax
-                     auto
-                     url="{{domain('/site/all/instances')}}"
-                     handle-as="json"
-                     last-response="{{instances}}"
-                     debounce-duration="300"></iron-ajax>
-                  <template is="dom-repeat" items="[[instances]]" as="instance">
-                     <paper-card>
+				<paper-card>
                      	<paper-item><span class="instance rspace" on-click="launch"></span><span class="name space">{{instance.tag}}</span></paper-item>
                      	<div class="container">
                      		<paper-fab class="label retracted" label="{{balance(instance)}}" title="balance" on-click="extend"></paper-fab>                           	                     	          						
@@ -153,7 +145,6 @@
    						</template>
                         <textarea style="display:none; width:100%; height:100px">{{stringify(instance)}}</textarea>
                      </paper-card>
-                  </template>
    </template>
    <script> 
  	 function closest(el, selector) {
@@ -162,9 +153,9 @@
    	     else return closest(el.parentElement, selector)
    	 }
 
-   	 class MyInstances extends ReduxMixin(Polymer.Element) {
+   	 class MyInstance extends ReduxMixin(Polymer.Element) {
    	     static get is() {
-   	         return 'my-instances';
+   	         return 'my-instance';
    	     }
    	     static get properties() {
    	         return {
@@ -179,9 +170,10 @@
    	             operators: {
    	                 type: Array,
    	                 statePath: 'operators'
-   	             },   	             
-   	             instances: {
-   	                 type: Array
+   	             },   	 
+   	        	 instance: {
+   	               type: Object,
+   	               notify: true // fire mydata-change CustomEvent on change
    	             },
    	             acts: {
    	                 type: Array,
@@ -292,7 +284,7 @@
    	         } else if (site == 'mail') {
    	             window.open('http://www.scewpt.com/inbox/index.html', '_blank');
    	         } else if (site.indexOf('service') > -1) {
-   	             window.open('http://service.ventorta.com', '_blank');
+   	             window.open('http://service.' + nativeDomain(), '_blank');
    	         }
    	     }
    	     extend(event) {
@@ -331,9 +323,6 @@
    	    	 }
    	    	 return '';
    	     }
-   	     domain(url) {
-   	         return '//service.' + nativeDomain() + url
-   	     }
    	     stringify(item) {
    	         return JSON.stringify(item);
    	     }
@@ -350,6 +339,6 @@
 	   }   	     
    	 }
 
-   	 customElements.define(MyInstances.is, MyInstances);      
+   	 customElements.define(MyInstance.is, MyInstance);      
    </script>
 </dom-module>
