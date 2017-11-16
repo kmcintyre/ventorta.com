@@ -1,4 +1,6 @@
 script
-html
 bower_components
 node_modules
+polymer
+build
+.project
